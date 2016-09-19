@@ -1,0 +1,13 @@
+/**
+ * Display
+ */
+
+.hidden {
+  display: none !important;
+}
+
+.assistive-text {
+  position: absolute !important;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px,1px,1px,1px);
+}

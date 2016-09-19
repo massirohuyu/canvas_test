@@ -1,0 +1,23 @@
+{
+  "name": "template-gulp",
+  "version": "0.0.0",
+  "description": "template with gulp",
+  "main": "index.html",
+  "author": "seino",
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-clean-css": "^2.0.12",
+    "gulp-concat": "^2.5.2",
+    "gulp-html5-lint": "^1.1.0",
+    "gulp-pleeease": "^1.2.0",
+    "gulp-plumber": "^1.0.1",
+    "gulp-sass": "^2.0.1",
+    "gulp-uglify": "^1.2.0",
+    "gulp-webserver": "^0.9.1",
+    "merge-stream": "^1.0.0"
+  },
+  "dependencies": {
+    "jquery": "^2.1.4"
+  },
+  "private": true
+}
