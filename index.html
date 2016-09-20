@@ -20,6 +20,7 @@
   <![endif]-->
   <script src="js/lib/jquery.min.js"></script>
   <script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.0.0/pixi.min.js"></script>
   <link rel="shortcut icon" href="">
   <!--
     <meta name="mobile-web-app-capable" content="yes">
@@ -40,9 +41,11 @@
     </header>
 
     <div class="contents">
-
       <main class="content-main">
-        <canvas id="demoCanvas" width="1000" height="600"></canvas>
+        <nav>
+          <button type="button" id="createjs">Use Create.js</button>
+          <button type="button" id="pixijs">Use Pixi.js</button>
+        </nav>
       </main><!--/content-main-->
 
 
@@ -53,7 +56,9 @@
 
 </body>
 <script>
-  $(document).ready(function() {
+  $('#createjs').one('click',function() {
+    $('#pixijs').remove();
+    $('<canvas id="demoCanvas" width="1000" height="600"></canvas>').appendTo('main');
     var stage = new createjs.Stage("demoCanvas");
     stage.name = "stage";
     stage.mouseMoveOutside = true;
@@ -119,6 +124,46 @@
         });
       }
     });
+  });
+  $('#pixijs').one('click',function() {
+    $('#createjs').remove();
+    var renderer = new PIXI.autoDetectRenderer(1000, 600, {antialias: true,transparent:true});
+    $('main').append(renderer.view);
+
+    var stage = new PIXI.Container();
+
+    //テクスチャの生成
+    var texture = new PIXI.RenderTexture(renderer);
+    var rd = new PIXI.Graphics()
+    rd.beginFill(0xFBF6E8);
+    rd.drawRect(0, 0, 100, 100)
+    rd.endFill()
+    texture.render(rd);
+
+    //ボタンの生成
+    var button = new PIXI.Sprite(texture);
+    button.anchor.x = 0.5;
+    button.anchor.y = 0.5;
+    button.position.x = 1000 * 0.5;
+    button.position.y = 600 * 0.5;
+
+    //タッチイベント(マウスイベント)を有効化
+    // button.interactive = true;
+    stage.interactive = true;
+    //ボタンをステージに追加
+    stage.addChild(button);
+    //イベントの追加
+    // button
+    // .on('click', function () {
+    //   alert('button clicked');
+    // });
+    stage
+    .on('click', function () {
+      alert('stage clicked');
+    });
+
+    renderer.render(stage);
+    console.log(renderer);
   });
 </script>
 
