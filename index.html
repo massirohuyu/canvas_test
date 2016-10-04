@@ -131,39 +131,91 @@
     $('main').append(renderer.view);
 
     var stage = new PIXI.Container();
+      //タッチイベント(マウスイベント)を有効化
+
+    //背景の生成
+    var background_rect = new PIXI.RenderTexture(renderer);
+    var rd1 = new PIXI.Graphics()
+    rd1.beginFill(0xFFFFFF);
+    rd1.drawRect(0, 0, 1000, 600)
+    rd1.endFill()
+    background_rect.render(rd1);
+    var background = new PIXI.Sprite(background_rect);
+    background.interactive = true;
+    background.width = 1000;
+    background.height = 600;
+    background.position.x = 0;
+    background.position.y = 0;
+    stage.addChild(background);
 
     //テクスチャの生成
     var texture = new PIXI.RenderTexture(renderer);
-    var rd = new PIXI.Graphics()
-    rd.beginFill(0xFBF6E8);
-    rd.drawRect(0, 0, 100, 100)
-    rd.endFill()
-    texture.render(rd);
+    var rd2 = new PIXI.Graphics()
+    rd2.beginFill(0xFBF6E8);
+    rd2.drawRect(0, 0, 100, 100);
+    rd2.endFill();
+    texture.render(rd2);
 
-    //ボタンの生成
-    var button = new PIXI.Sprite(texture);
-    button.anchor.x = 0.5;
-    button.anchor.y = 0.5;
-    button.position.x = 1000 * 0.5;
-    button.position.y = 600 * 0.5;
+    background
+    .on('click', function (evt) {
+      //ボタンの生成
+      var sticky = new PIXI.Sprite(texture);
+      sticky.interactive = true;
+      sticky.buttonMode = true;
+      sticky.anchor.set(0.5);
 
-    //タッチイベント(マウスイベント)を有効化
-    // button.interactive = true;
-    stage.interactive = true;
-    //ボタンをステージに追加
-    stage.addChild(button);
-    //イベントの追加
-    // button
-    // .on('click', function () {
-    //   alert('button clicked');
-    // });
-    stage
-    .on('click', function () {
-      alert('stage clicked');
+      //ボタンをステージに追加
+      stage.addChild(sticky);
+
+      //位置の確定
+      var newPosition = evt.data.getLocalPosition(this.parent);
+      sticky.position.x = newPosition.x;
+      sticky.position.y = newPosition.y;
+
+      //イベントの追加
+      sticky
+      // ドラッグを開始
+        .on('mousedown', onDragStart)
+        .on('touchstart', onDragStart)
+      // ドロップ（ドラッグを終了）
+        .on('mouseup', onDragEnd)
+        .on('mouseupoutside', onDragEnd)
+        .on('touchend', onDragEnd)
+        .on('touchendoutside', onDragEnd)
+      // ドラッグ中
+        .on('mousemove', onDragMove)
+        .on('touchmove', onDragMove)
     });
 
+    function onDragStart(evt) {
+      this.data = evt.data;
+      this.alpha = 0.5;
+      this.dragging = true;
+      this.mousePosition = evt.data.getLocalPosition(this);
+    }
+
+    function onDragEnd() {
+      this.alpha = 1;
+      this.dragging = false;
+
+      this.data = null;
+    }
+
+    function onDragMove() {
+      if (this.dragging) {
+        var newPosition = this.data.getLocalPosition(this.parent);
+        this.position.x = newPosition.x - this.mousePosition.x;
+        this.position.y = newPosition.y - this.mousePosition.y;
+      }
+    }
+
+    requestAnimationFrame( animate )
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(stage);
+    }
+
     renderer.render(stage);
-    console.log(renderer);
   });
 </script>
 
