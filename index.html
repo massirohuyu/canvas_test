@@ -19,8 +19,7 @@
     <script src="javascripts/html5shiv.min.js"></script>
   <![endif]-->
   <script src="js/lib/jquery.min.js"></script>
-  <script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.0.0/pixi.min.js"></script>
+  <script src="js/lib/fabric.min.js"></script>
   <link rel="shortcut icon" href="">
   <!--
     <meta name="mobile-web-app-capable" content="yes">
@@ -42,13 +41,7 @@
 
     <div class="contents">
       <main class="content-main">
-        <nav>
-          <button type="button" id="createjs">Use Create.js</button>
-          <button type="button" id="pixijs">Use Pixi.js</button>
-        </nav>
       </main><!--/content-main-->
-
-
     </div><!--/contents-->
 
   </div>
@@ -56,167 +49,68 @@
 
 </body>
 <script>
-  $('#createjs').one('click',function() {
-    $('#pixijs').remove();
-    $('<canvas id="demoCanvas" width="1000" height="600"></canvas>').appendTo('main');
-    var stage = new createjs.Stage("demoCanvas");
-    stage.name = "stage";
-    stage.mouseMoveOutside = true;
-    stage.enableMouseOver(10);
+  // (function(){
+    var $canvas = $('<canvas id="demoCanvas" width="1000" height="600"></canvas>').appendTo('main'),
+        canvas = new fabric.Canvas($canvas[0]);
 
-    stage.on("stagemouseup", function(evt) {
-      // console.log(evt.relatedTarget);
-      // var evt = {};
-      // evt.stageX = 100;
-      // evt.stageY = 100;
-      if(!evt.relatedTarget) {
-        var sticky = new createjs.Container(),
-        sticky_bg = new createjs.Shape(),
-        sticky_bg_shadow = new createjs.Shadow("rgba(0,0,0,.3)", 1, 1, 3),
-        sticky_label = new createjs.Text("test", "14px", "#333333");
-
-        sticky_label.textAlign = "center";
-        sticky_label.textBaseline = "middle";
-        sticky_label.x = 0;
-        sticky_label.y = 0;
-
-        sticky_bg.graphics.beginFill("#fbf6e8").drawRect(0,0,100,100);
-        sticky_bg.shadow = sticky_bg_shadow;
-        sticky_bg.regX = 50;
-        sticky_bg.regY = 50;
-        sticky_bg.x = 0;
-        sticky_bg.y = 0;
-        sticky.addChild(sticky_bg);
-        sticky.addChild(sticky_label);
-
-        sticky.cursor = "pointer";
-        sticky.x = evt.stageX;
-        sticky.y = evt.stageY;
-        stage.addChild(sticky);
-
-        stage.update();
-
-        var mouse = {
-            x : 0,
-            y : 0
-        };
-
-        sticky.on("mousedown", function(evt) {
-          // console.log(evt);
-          sticky_bg_shadow.blur = 10;
-          sticky_bg_shadow.offsetX = 3;
-          sticky_bg_shadow.offsetY = 3;
-          mouse.x = evt.localX;
-          mouse.y = evt.localY;
-        });
-        sticky.on("pressmove", function(evt) {
-          // console.log(evt);
-          // console.log('move');
-          sticky.x = evt.stageX - mouse.x;
-          sticky.y = evt.stageY - mouse.y;
-          stage.update();
-        });
-        sticky.on("pressup", function(evt) {
-          sticky_bg_shadow.blur = 3;
-          sticky_bg_shadow.offsetX = 1;
-          sticky_bg_shadow.offsetY = 1;
-          stage.update();
-        });
+    // 矩形オブジェクトを作る
+    var rect = new fabric.Rect({
+      left: 100,
+      top: 100,
+      fill: '#fbf5eb',
+      width: 200,
+      height: 200,
+      padding: 3,
+      borderColor: 'rgba(0, 0, 255, 0.3)',
+      cornerColor: 'rgba(0, 0, 255, 0.3)',
+      cornerSize: 8,
+      transparentCorners: false,
+      shadow: {
+        color: 'rgba(0, 0, 0, 0.3)',
+        blur: 1,
+        offsetX: 3,
+        offsetY: 3
       }
     });
-  });
-  $('#pixijs').one('click',function() {
-    $('#createjs').remove();
-    var renderer = new PIXI.autoDetectRenderer(1000, 600, {antialias: true,transparent:true});
-    $('main').append(renderer.view);
 
-    var stage = new PIXI.Container();
-      //タッチイベント(マウスイベント)を有効化
+    function animate(e, dir, callback) {
+      if (e.target) {
+        fabric.util.animate({
+          startValue: e.target.get('scaleX'),
+          endValue: e.target.get('scaleX') + (dir ? 0.05 : -0.05),
+          duration: 80,
+          onChange: function(value) {
+            e.target.scale(value);
+            canvas.renderAll();
+          },
+          onComplete: function() {
+            e.target.setCoords();
+            if(callback) callback(e);
+          }
+        });
 
-    //背景の生成
-    var background_rect = new PIXI.RenderTexture(renderer);
-    var rd1 = new PIXI.Graphics()
-    rd1.beginFill(0xFFFFFF);
-    rd1.drawRect(0, 0, 1000, 600)
-    rd1.endFill()
-    background_rect.render(rd1);
-    var background = new PIXI.Sprite(background_rect);
-    background.interactive = true;
-    background.width = 1000;
-    background.height = 600;
-    background.position.x = 0;
-    background.position.y = 0;
-    stage.addChild(background);
-
-    //テクスチャの生成
-    var texture = new PIXI.RenderTexture(renderer);
-    var rd2 = new PIXI.Graphics()
-    rd2.beginFill(0xFBF6E8);
-    rd2.drawRect(0, 0, 100, 100);
-    rd2.endFill();
-    texture.render(rd2);
-
-    background
-    .on('click', function (evt) {
-      //ボタンの生成
-      var sticky = new PIXI.Sprite(texture);
-      sticky.interactive = true;
-      sticky.buttonMode = true;
-      sticky.anchor.set(0.5);
-
-      //ボタンをステージに追加
-      stage.addChild(sticky);
-
-      //位置の確定
-      var newPosition = evt.data.getLocalPosition(this.parent);
-      sticky.position.x = newPosition.x;
-      sticky.position.y = newPosition.y;
-
-      //イベントの追加
-      sticky
-      // ドラッグを開始
-        .on('mousedown', onDragStart)
-        .on('touchstart', onDragStart)
-      // ドロップ（ドラッグを終了）
-        .on('mouseup', onDragEnd)
-        .on('mouseupoutside', onDragEnd)
-        .on('touchend', onDragEnd)
-        .on('touchendoutside', onDragEnd)
-      // ドラッグ中
-        .on('mousemove', onDragMove)
-        .on('touchmove', onDragMove)
-    });
-
-    function onDragStart(evt) {
-      this.data = evt.data;
-      this.alpha = 0.5;
-      this.dragging = true;
-      this.mousePosition = evt.data.getLocalPosition(this);
-    }
-
-    function onDragEnd() {
-      this.alpha = 1;
-      this.dragging = false;
-
-      this.data = null;
-    }
-
-    function onDragMove() {
-      if (this.dragging) {
-        var newPosition = this.data.getLocalPosition(this.parent);
-        this.position.x = newPosition.x - this.mousePosition.x;
-        this.position.y = newPosition.y - this.mousePosition.y;
+        fabric.util.animate({
+          'shadow.offsetX': dir ? 20 : 0.00001,
+          'shadow.offsetY': dir ? 20 : 0.00001
+        }, {
+          duration: 80
+      });
       }
     }
 
-    requestAnimationFrame( animate )
-    function animate() {
-        requestAnimationFrame(animate);
-        renderer.render(stage);
-    }
+    canvas.on('mouse:down', function(e) { animate(e, 1, function(e){ animate(e, 0); }); });
+    // canvas.on('mouse:up', function(e) { animate(e, 0); });
 
-    renderer.render(stage);
-  });
+    // canvas 上に矩形を追加する
+    canvas.add(rect);
+
+
+    // canvas.selectionColor = 'rgba(255,0,0,1)';
+    // canvas.selectionBorderColor = 'blue';
+    // canvas.selectionLineWidth = 5;
+
+    console.log(canvas);
+  // })();
 </script>
 
 </html>
