@@ -407,6 +407,15 @@ body ul, body ol {
 /* Project
    ----------------------------------------------------------------- */
 /**
+ * canvas
+ */
+
+.main-canvas {
+  display: block;
+  margin: -15px;
+}
+
+/**
  * login menu
  */
 .p-login-menu__content {

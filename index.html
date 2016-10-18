@@ -50,35 +50,38 @@
 </body>
 <script>
   // (function(){
-    var $canvas = $('<canvas id="demoCanvas" width="1000" height="600"></canvas>').appendTo('main'),
-        canvas = new fabric.Canvas($canvas[0]);
+    var canvasWidth = window.innerWidth;
+        $canvas = $('<canvas id="demoCanvas" class="main-canvas" width="' + canvasWidth + '" height="600"></canvas>').appendTo('main'),
+        canvas = new fabric.Canvas($canvas[0]),
+        defaultOptions = {
+          left: 100,
+          top: 100,
+          fill: '#f7e6ce',
+          width: 200,
+          height: 200,
+          shadow: {
+            color: 'rgba(0, 0, 0, 0.3)',
+            blur: 1,
+            offsetX: 1,
+            offsetY: 1
+          }
+        };
 
-    // 矩形オブジェクトを作る
-    var rect = new fabric.Rect({
-      left: 100,
-      top: 100,
-      fill: '#fbf5eb',
-      width: 200,
-      height: 200,
-      padding: 3,
-      borderColor: 'rgba(0, 0, 255, 0.3)',
-      cornerColor: 'rgba(0, 0, 255, 0.3)',
+    //デフォルト選択スタイル設定
+    $.extend( fabric.Object.prototype, {
+      borderColor: 'rgba(0, 100, 255, 0.3)',
+      cornerColor: 'rgba(0, 100, 255, 0.3)',
       cornerSize: 8,
       transparentCorners: false,
-      shadow: {
-        color: 'rgba(0, 0, 0, 0.3)',
-        blur: 1,
-        offsetX: 3,
-        offsetY: 3
-      }
+      padding: 5,
     });
 
     function animate(e, dir, callback) {
       if (e.target) {
         fabric.util.animate({
           startValue: e.target.get('scaleX'),
-          endValue: e.target.get('scaleX') + (dir ? 0.05 : -0.05),
-          duration: 80,
+          endValue: e.target.get('scaleX') + (dir ? 0.02 : -0.02),
+          duration: 50,
           onChange: function(value) {
             e.target.scale(value);
             canvas.renderAll();
@@ -88,21 +91,65 @@
             if(callback) callback(e);
           }
         });
-
-        fabric.util.animate({
-          'shadow.offsetX': dir ? 20 : 0.00001,
-          'shadow.offsetY': dir ? 20 : 0.00001
-        }, {
-          duration: 80
-      });
       }
     }
 
-    canvas.on('mouse:down', function(e) { animate(e, 1, function(e){ animate(e, 0); }); });
-    // canvas.on('mouse:up', function(e) { animate(e, 0); });
+    var mouseDowned = { state: false, target: null },
+        selectionCleared = { state: false, target: null };
 
-    // canvas 上に矩形を追加する
-    canvas.add(rect);
+    canvas.on('object:selected', function(e) {
+      console.log('object:selected');
+      console.log(e);
+    });
+
+    canvas.on('selection:cleared', function(e) {
+      console.log('selection:cleared');
+      selectionCleared = { state: true, target: e.target };
+      console.log(e);
+    });
+
+    canvas.on('mouse:down', function(e) {
+      console.log('mouse:down');
+      mouseDowned = { state: true, target: e.target };
+      console.log(e)
+    });
+
+    canvas.on('mouse:move', function(e) {
+      mouseDowned = { state: false, target: null };
+      selectionCleared = { state: false, target: null };
+    });
+
+    canvas.on('mouse:up', function(e) {
+      console.log('mouse:up');
+      if( mouseDowned.state ) {
+        if( !mouseDowned.target ) {
+          //直前に選択状態が解除された場合は作らない
+          if( selectionCleared.state ) {
+            selectionCleared = { state: false, target: null };
+            return;
+          }
+
+          mouse_start_pos = canvas.getPointer(e.e);
+          // 矩形オブジェクトを作る
+          var rect = new fabric.Rect($.extend(defaultOptions, {
+            left: mouse_start_pos.x - defaultOptions.width / 2,
+            top: mouse_start_pos.y - defaultOptions.height / 2
+          }));
+          // canvas 上に矩形を追加する
+          canvas.add(rect);
+        } else {
+          canvas.trigger('mouse:click', e);
+        }
+      }
+      selectionCleared = { state: false, target: null };
+      console.log(e)
+    });
+
+    canvas.on('mouse:click', function(e) {
+      console.log('mouse:click');
+      console.log(e);
+      animate(e, 1, function(e){ animate(e, 0); });
+    });
 
 
     // canvas.selectionColor = 'rgba(255,0,0,1)';
