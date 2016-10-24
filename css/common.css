@@ -407,12 +407,12 @@ body ul, body ol {
 /* Project
    ----------------------------------------------------------------- */
 /**
- * canvas
+ * main canvas
  */
-
-.main-canvas {
-  display: block;
-  margin: -15px;
+.canvas-container {
+  float: left;
+  border: dotted #444 1px;
+  margin: 5px;
 }
 
 /**
