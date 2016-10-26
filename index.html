@@ -52,7 +52,7 @@
   // (function(){
 
     var createCanvas = function(count) {
-      var canvasWidth = window.innerWidth/2 -30,
+      var canvasWidth = window.innerWidth/2 -40,
           $canvas = $('<canvas id="demoCanvas' + count + '" class="main-canvas" width="' + canvasWidth + '" height="600"></canvas>').appendTo('main'),
           canvas = new fabric.Canvas($canvas[0]),
           defaultOptions = {
@@ -77,6 +77,8 @@
         cornerSize: 8,
         transparentCorners: false,
         padding: 5,
+        originX: 'center',
+        originY: 'center'
       });
 
       function animate(e, dir, callback) {
@@ -134,8 +136,8 @@
 
             mouse_start_pos = canvas.getPointer(e.e);
             $(document).trigger('sticky:create', {
-              left: mouse_start_pos.x - defaultOptions.width / 2,
-              top: mouse_start_pos.y - defaultOptions.height / 2
+              left: mouse_start_pos.x,
+              top: mouse_start_pos.y
             })
           } else {
             canvas.trigger('mouse:click', e);
@@ -154,17 +156,9 @@
       canvas.on('object:modified', function(e) {
         console.log('object:modified');
         console.log(e);
-        var objects = [];
 
         if(typeof e.target.id === 'number') {
-          objects.push(e.target);
-        } else {
-          objects = e.target._objects;
-        }
-
-        objects.forEach( function(target) {
-          console.log('each');
-          // debugger
+          target = e.target;
           $(document).trigger('sticky:modified', {
             id: target.id,
             left: target.left,
@@ -172,9 +166,26 @@
             width: target.width,
             height: target.height,
             scaleX: target.scaleX,
-            scaleY: target.scaleY
-          })
-        });
+            scaleY: target.scaleY,
+            angle: target.angle
+          });
+        } else {
+          parent = e.target;
+          parentOrg = parent.getPointByOrigin(); //TODO:ここでlocalPointからglobalPointに変換したい
+          e.target._objects.forEach( function(target) {
+            console.log('each');
+            $(document).trigger('sticky:modified', {
+              id: target.id,
+              left: parentOrg.x + target.left,
+              top: parentOrg.y + target.top,
+              width: target.width,
+              height: target.height,
+              scaleX: target.scaleX * parent.scaleX,
+              scaleY: target.scaleY * parent.scaleY,
+              angle: target.angle + parent.angle
+            });
+          });
+        }
       });
 
       $(document).on('sticky:create', function(e, config){
@@ -186,18 +197,6 @@
         }));
         id_counter++;
 
-        // sticky.on('modified', function(e) {
-        //   console.log('modified');
-          // $(document).trigger('sticky:modified', {
-          //   id: this.id,
-          //   left: this.left,
-          //   top: this.top,
-          //   width: this.width,
-          //   height: this.height,
-          //   scaleX: this.scaleX,
-          //   scaleY: this.scaleY
-          // })
-        // });
         // canvas 上に矩形を追加する
         canvas.add(sticky);
       });
@@ -208,12 +207,24 @@
         console.log(canvas);
         console.log(sticky);
         console.log(config);
-        sticky.setLeft(config.left);
-        sticky.setTop(config.top);
-        sticky.setWidth(config.width);
-        sticky.setHeight(config.height);
-        sticky.setScaleX(config.scaleX);
-        sticky.setScaleY(config.scaleY);
+        if(sticky.group) {
+          point = sticky.group.toLocalPoint(new fabric.Point(config.left, config.top), 'center', 'center');
+          sticky.left = point.x / sticky.group.scaleX;
+          sticky.top = point.y / sticky.group.scaleY;
+          sticky.width = config.width;
+          sticky.height = config.height;
+          sticky.scaleX = config.scaleX / sticky.group.scaleX;
+          sticky.scaleY = config.scaleY / sticky.group.scaleY;
+          sticky.angle = config.angle - sticky.group.angle;
+        } else {
+          sticky.left = config.left;
+          sticky.top = config.top;
+          sticky.width = config.width;
+          sticky.height = config.height;
+          sticky.scaleX = config.scaleX;
+          sticky.scaleY = config.scaleY;
+          sticky.angle = config.angle;
+        }
         sticky.setCoords();
         canvas.renderAll();
       });
