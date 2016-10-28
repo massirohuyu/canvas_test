@@ -83,12 +83,15 @@
 
       function animate(e, dir, callback) {
         if (e.target) {
+          var org_scaleX = e.target.get('scaleX'),
+              org_scaleY = e.target.get('scaleY');
           fabric.util.animate({
-            startValue: e.target.get('scaleX'),
-            endValue: e.target.get('scaleX') + (dir ? 0.02 : -0.02),
+            startValue: 1,
+            endValue: dir ? 1.02 : 1/1.02,
             duration: 50,
             onChange: function(value) {
-              e.target.scale(value);
+              e.target.setScaleX(org_scaleX*value);
+              e.target.setScaleY(org_scaleY*value);
               canvas.renderAll();
             },
             onComplete: function() {
@@ -158,7 +161,7 @@
         console.log(e);
 
         if(typeof e.target.id === 'number') {
-          target = e.target;
+          var target = e.target;
           $(document).trigger('sticky:modified', {
             id: target.id,
             left: target.left,
@@ -170,8 +173,8 @@
             angle: target.angle
           });
         } else {
-          parent = e.target;
-          parentOrg = parent.getPointByOrigin(); //TODO:ここでlocalPointからglobalPointに変換したい
+          var parent = e.target,
+              parentOrg = parent.getPointByOrigin(); //TODO:ここでlocalPointからglobalPointに変換したい
           e.target._objects.forEach( function(target) {
             console.log('each');
             $(document).trigger('sticky:modified', {
