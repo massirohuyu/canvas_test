@@ -68,6 +68,50 @@
               offsetY: 1
             }
           },
+          defaultFrameOptions = {
+            left: 1300,
+            top: 100,
+            stroke: '#444',
+            strokeWidth: 5,
+            fill: 'transparent',
+            width: 300,
+            height: 300
+          },
+          colors = [
+            ['yellow', '#f7e6ce'],
+            ['pink', '#f7ced3'],
+            ['blue', '#cee9f7'],
+            ['green', '#d0f7ce']
+          ],
+          object_types = [
+            'sticky',
+            'frame'
+          ],
+          currentObjectType = object_types[0],
+          $colorButtons = (function(){
+            var $buttonsBox = $('<div>');
+            colors.forEach(function(color){
+              $button = $('<label><input type="radio" name="color_'+count+'">' + color[0] + '</label>');
+              $button.on('click', function() {
+                defaultOptions.fill = color[1];
+              });
+              $buttonsBox.append($button);
+            });
+            $buttonsBox.find('input').first().attr('checked', true);
+            return $buttonsBox;
+          })().prependTo('main'),
+          $objectButtons =  (function(){
+            var $buttonsBox = $('<div>');
+            object_types.forEach(function(object_type){
+              $button = $('<label><input type="radio" name="object_type_'+count+'">' + object_type + '</label>');
+              $button.on('click', function() {
+                currentObjectType = object_type;
+              });
+              $buttonsBox.append($button);
+            });
+            $buttonsBox.find('input').first().attr('checked', true);
+            return $buttonsBox;
+          })().prependTo('main'),
           id_counter = 0;
 
       //デフォルト選択スタイル設定
@@ -138,10 +182,18 @@
             }
 
             mouse_start_pos = canvas.getPointer(e.e);
-            $(document).trigger('sticky:create', {
-              left: mouse_start_pos.x,
-              top: mouse_start_pos.y
-            })
+            if(currentObjectType === object_types[0]) {
+              $(document).trigger('sticky:create', {
+                left: mouse_start_pos.x,
+                top: mouse_start_pos.y,
+                fill: defaultOptions.fill
+              })
+            } else {
+              $(document).trigger('frame:create', {
+                left: mouse_start_pos.x,
+                top: mouse_start_pos.y
+              })
+            }
           } else {
             canvas.trigger('mouse:click', e);
           }
@@ -170,7 +222,14 @@
             height: target.height,
             scaleX: target.scaleX,
             scaleY: target.scaleY,
-            angle: target.angle
+            angle: target.angle,
+            group_left: null, // 目的としてはgroupのデータがないということを伝えたいのですが、
+            group_top: null, // nullという書き方であっているのでしょうか・・・？
+            group_width: null,
+            group_height: null,
+            group_scaleX: null,
+            group_scaleY: null,
+            group_angle: null
           });
         } else {
           var parent = e.target,
@@ -179,13 +238,21 @@
             console.log('each');
             $(document).trigger('sticky:modified', {
               id: target.id,
-              left: parentOrg.x + target.left,
-              top: parentOrg.y + target.top,
+              left: target.left,
+              top: target.top,
               width: target.width,
               height: target.height,
-              scaleX: target.scaleX * parent.scaleX,
-              scaleY: target.scaleY * parent.scaleY,
-              angle: target.angle + parent.angle
+              scaleX: target.scaleX,
+              scaleY: target.scaleY,
+              angle: target.angle,
+              group_left: parent.left,
+              group_top: parent.top,
+              group_width: parent.width,
+              group_height: parent.height,
+              group_scaleX: parent.scaleX,
+              group_scaleY: parent.scaleY,
+              group_angle: parent.angle
+
             });
           });
         }
@@ -193,10 +260,11 @@
 
       $(document).on('sticky:create', function(e, config){
         //矩形オブジェクトを作る
-        var sticky = new fabric.Rect($.extend(defaultOptions, {
+        var sticky = new fabric.Rect($.extend({}, defaultOptions, {
           id: id_counter,
           left: config.left,
-          top: config.top
+          top: config.top,
+          fill: config.fill
         }));
         id_counter++;
 
@@ -204,22 +272,66 @@
         canvas.add(sticky);
       });
 
+      // 角度をラジアンに変換
+      Math.degrees = function(radians) {
+        return radian * 180 / Math.PI;
+      };
+      var radian, group_radian, r, x, y;
+
       $(document).on('sticky:modified', function(e, config){
         console.log('sticky:modified');
         var sticky = canvas.getObjects().find(function(o){ return o.id === config.id });
         console.log(canvas);
         console.log(sticky);
         console.log(config);
-        if(sticky.group) {
-          point = sticky.group.toLocalPoint(new fabric.Point(config.left, config.top), 'center', 'center');
-          sticky.left = point.x / sticky.group.scaleX;
-          sticky.top = point.y / sticky.group.scaleY;
+        if(config.group_left != null　&& sticky.group) { //送信側も受信側もグループ　の時
+          // var point = sticky.group.toLocalPoint(new fabric.Point(config.left, config.top), 'center', 'center');
+          sticky.left = config.left;
+          sticky.top = config.top;
           sticky.width = config.width;
           sticky.height = config.height;
-          sticky.scaleX = config.scaleX / sticky.group.scaleX;
-          sticky.scaleY = config.scaleY / sticky.group.scaleY;
-          sticky.angle = config.angle - sticky.group.angle;
-        } else {
+          sticky.scaleX = config.scaleX;
+          sticky.scaleY = config.scaleY;
+          sticky.angle = config.angle;
+          sticky.group.left = config.group_left;
+          sticky.group.top = config.group_top;
+          sticky.group.width = config.group_width;
+          sticky.group.height = config.group_height;
+          sticky.group.scaleX = config.group_scaleX;
+          sticky.group.scaleY = config.group_scaleY;
+          sticky.group.angle = config.group_angle;
+        } else if(config.group_left != null　&& !sticky.group) { //送信側がグループ、受信側が単独　の時
+          r = Math.sqrt(Math.pow((config.left),2) + Math.pow((config.top),2)); //group原点からsticky中央までの距離（半径として扱う）
+          radian = Math.atan2(config.top, config.left);　//group原点からsticky中央までのラジアン(角度)
+          group_radian = radian + (config.group_angle / 180 * Math.PI) //groupが傾いた時のstickyのラジアン
+          x = r * Math.cos(group_radian);  // group原点からのX座標
+          y = r * Math.sin(group_radian);  // group原点からのY座標
+          // ↑メソッドにまとめた方が良いでしょうか？
+          sticky.left = x * config.group_scaleX + config.group_left;
+          sticky.top =  y * config.group_scaleY + config.group_top;
+          sticky.width = config.width;
+          sticky.height = config.height;
+          sticky.scaleX = config.scaleX * config.group_scaleX;
+          sticky.scaleY = config.scaleY * config.group_scaleY;
+            if(config.angle === 0){sticky.angle = config.group_angle}
+            else if(config.group_angle === 0){sticky.angle = config.angle}
+            else{sticky.angle = config.angle * config.group_angle};
+        } else if(config.group_left === null　&& sticky.group) { //送信側が単独、受信側がグループ　の時
+          sticky.left = config.left - sticky.group.left;
+          sticky.top = config.top - sticky.group.top;
+          sticky.width = config.width;
+          sticky.height = config.height;
+          sticky.scaleX = config.scaleX/sticky.group.scaleX;
+          sticky.scaleY = config.scaleY/sticky.group.scaleY;
+          sticky.angle = config.angle/sticky.group.angle;
+          sticky.group.left = sticky.group.left;
+          sticky.group.top = sticky.group.top;
+          sticky.group.width = sticky.group.width;
+          sticky.group.height = sticky.group.height;
+          sticky.group.scaleX = sticky.group.scaleX;
+          sticky.group.scaleY = sticky.group.scaleY;
+          sticky.group.angle = sticky.group.angle;
+        }else{　//送信側も受信側も単独のとき
           sticky.left = config.left;
           sticky.top = config.top;
           sticky.width = config.width;
@@ -230,6 +342,18 @@
         }
         sticky.setCoords();
         canvas.renderAll();
+      });
+
+      $(document).on('frame:create', function(e, config){
+        var frame = new fabric.Rect($.extend({}, defaultFrameOptions, {
+          id: id_counter,
+          left: config.left,
+          top: config.top
+        }));
+        id_counter++;
+
+        canvas.add(frame);
+        canvas.sendToBack(frame);
       });
     }
 
