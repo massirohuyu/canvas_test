@@ -34,13 +34,16 @@
   <div class="container">
 
     <header class="header clearfix" id="page-top">
-      <h1>
-
+      <h1 class="header__title">
+        みんなのホワイトボード
       </h1>
     </header>
 
     <div class="contents">
       <main class="content-main">
+        <div id="toolbox" class="toolbox">
+        </div>
+        <div id="mainCanvasContainer" class="main-canvas-container"></div>
       </main><!--/content-main-->
     </div><!--/contents-->
 
@@ -52,8 +55,9 @@
   // (function(){
 
     var createCanvas = function(count) {
-      var canvasWidth = window.innerWidth/2 -40,
-          $canvas = $('<canvas id="demoCanvas' + count + '" class="main-canvas" width="' + canvasWidth + '" height="600"></canvas>').appendTo('main'),
+      var canvasWidth = 2000,
+          canvasHeight = 2000,
+          $canvas = $('<canvas id="demoCanvas' + count + '" width="' + canvasWidth + '" height="' + canvasHeight + '"></canvas>').appendTo('#mainCanvasContainer'),
           canvas = new fabric.Canvas($canvas[0]),
           defaultOptions = {
             left: 100,
@@ -93,25 +97,29 @@
             colors.forEach(function(color){
               $button = $('<label><input type="radio" name="color_'+count+'">' + color[0] + '</label>');
               $button.on('click', function() {
+                $buttonsBox.find('label').removeClass('current');
+                $(this).addClass('current');
                 defaultOptions.fill = color[1];
               });
               $buttonsBox.append($button);
             });
-            $buttonsBox.find('input').first().attr('checked', true);
+            $buttonsBox.find('label').first().addClass('current').find('input').attr('checked', true);
             return $buttonsBox;
-          })().prependTo('main'),
+          })().prependTo('#toolbox'),
           $objectButtons =  (function(){
             var $buttonsBox = $('<div>');
             object_types.forEach(function(object_type){
               $button = $('<label><input type="radio" name="object_type_'+count+'">' + object_type + '</label>');
               $button.on('click', function() {
+                $buttonsBox.find('label').removeClass('current');
+                $(this).addClass('current');
                 currentObjectType = object_type;
               });
               $buttonsBox.append($button);
             });
-            $buttonsBox.find('input').first().attr('checked', true);
+            $buttonsBox.find('label').first().addClass('current').find('input').attr('checked', true);
             return $buttonsBox;
-          })().prependTo('main'),
+          })().prependTo('#toolbox'),
           id_counter = 0;
 
       //デフォルト選択スタイル設定
@@ -124,6 +132,8 @@
         originX: 'center',
         originY: 'center'
       });
+
+      canvas.allowTouchScrolling = true;
 
       function animate(e, dir, callback) {
         if (e.target) {
@@ -357,7 +367,7 @@
       });
     }
 
-    for(var i=0; i < 2; i++) {
+    for(var i=0; i < 1; i++) {
       createCanvas(i);
     }
   // })();
