@@ -43,6 +43,26 @@
       <main class="content-main">
         <div id="toolbox" class="toolbox">
         </div>
+        <div id="toolboxSticky" class="toolbox__sub--sticky">
+        </div>
+        <div id="timekeeperBox" class="timekeeper">
+          <input id="timekeeperTrigger" type="checkbox" class="hide">
+          <div class="timekeeper__time-remaining">
+            <div>残り時間</div>
+            <time>10:00</time>
+          </div>
+          <div class="timekeeper__messages">
+            <div class="timekeeper__messages__content">
+              付箋を貼ってください。
+              <form class="timekeeper__form">
+                タイムキーパー起動
+              </form>
+            </div>
+          </div>
+          <label class="timekeeper__charactor" for="timekeeperTrigger">
+            <img src="images/char_owl.png" width="89" alt="">
+          </label>
+        </div>
         <div id="mainCanvasContainer" class="main-canvas-container"></div>
       </main><!--/content-main-->
     </div><!--/contents-->
@@ -94,6 +114,7 @@
             var $buttonsBox = $('<div>');
             colors.forEach(function(color){
               $button = $('<label><input type="radio" name="color">' + color[0] + '</label>');
+              $button.css('color', color[1])
               $button.on('click', function() {
                 $buttonsBox.find('label').removeClass('current');
                 $(this).addClass('current');
@@ -103,7 +124,7 @@
             });
             $buttonsBox.find('label').first().addClass('current').find('input').attr('checked', true);
             return $buttonsBox;
-          })().prependTo('#toolbox'),
+          })().prependTo('#toolboxSticky'),
           $objectButtons =  (function(){
             var $buttonsBox = $('<div>');
             object_types.forEach(function(object_type){

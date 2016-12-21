@@ -418,39 +418,143 @@ body ul, body ol {
 /**
  * tool box
  */
-.toolbox {
+.toolbox, .toolbox__sub, .toolbox__sub--sticky {
   position: fixed;
   left: 20px;
   top: 80px;
-  width: 20px;
+  width: 2em;
   z-index: 1000;
 }
 
-.toolbox label {
+.toolbox label, .toolbox__sub label, .toolbox__sub--sticky label {
   display: inline-block;
   width: 2em;
   padding: .5em;
   color: #9ed8da;
   background-color: #215658;
+  cursor: pointer;
 }
 
-.toolbox label.current {
+.toolbox label:hover, .toolbox__sub label:hover, .toolbox__sub--sticky label:hover {
+  background-color: #133233;
+}
+
+.toolbox label.current, .toolbox__sub label.current, .toolbox__sub--sticky label.current {
   color: #ffeb48;
   background-color: #133233;
 }
 
-.toolbox label:first-child {
+.toolbox label:first-child, .toolbox__sub label:first-child, .toolbox__sub--sticky label:first-child {
   border-top-right-radius: .5em;
   border-top-left-radius: .5em;
 }
 
-.toolbox label:last-child {
+.toolbox label:last-child, .toolbox__sub label:last-child, .toolbox__sub--sticky label:last-child {
   border-bottom-right-radius: .5em;
   border-bottom-left-radius: .5em;
 }
 
-.toolbox input {
+.toolbox input, .toolbox__sub input, .toolbox__sub--sticky input {
   display: none;
+}
+
+.toolbox__sub, .toolbox__sub--sticky {
+  left: calc(20px + 3em);
+  top: 80px;
+  margin-left: .2em;
+  width: auto;
+  height: 20px;
+}
+
+.toolbox__sub label, .toolbox__sub--sticky label {
+  color: #e6e6e6;
+  background-color: #595959;
+  cursor: pointer;
+}
+
+.toolbox__sub label:hover, .toolbox__sub--sticky label:hover {
+  background-color: #333;
+}
+
+.toolbox__sub label.current, .toolbox__sub--sticky label.current {
+  color: #ffeb48;
+  background-color: #333;
+}
+
+.toolbox__sub label:first-child, .toolbox__sub--sticky label:first-child {
+  border-radius: 0;
+  border-top-left-radius: .5em;
+  border-bottom-left-radius: .5em;
+}
+
+.toolbox__sub label:last-child, .toolbox__sub--sticky label:last-child {
+  border-radius: 0;
+  border-top-right-radius: .5em;
+  border-bottom-right-radius: .5em;
+}
+
+/**
+ * timekeeper
+ */
+.timekeeper {
+  position: fixed;
+  z-index: 1001;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.timekeeper .timekeeper__time-remaining {
+  position: absolute;
+  left: 30px;
+  bottom: 100px;
+  border-radius: .5em;
+  background-color: rgba(203, 29, 29, 0.8);
+  color: #fff;
+  font-weight: bold;
+  padding: 10px 15px;
+  text-align: center;
+  width: 60px;
+}
+
+.timekeeper .timekeeper__time-remaining time {
+  font-size: 20px;
+}
+
+.timekeeper .timekeeper__messages {
+  position: absolute;
+  left: 150px;
+  bottom: 20px;
+  border-radius: .5em;
+  background-color: rgba(0, 0, 0, 0.7);
+  width: calc(100% - 200px - 2em);
+  padding: 1em 1.5em;
+  min-height: 3em;
+  color: #fff;
+}
+
+.timekeeper .timekeeper__messages:before {
+  content: "";
+  display: block;
+  position: absolute;
+  right: 100%;
+  bottom: 30px;
+  border-style: solid;
+  border-width: 10px 10px 10px 0;
+  border-color: transparent rgba(0, 0, 0, 0.7);
+}
+
+.timekeeper .timekeeper__messages .timekeeper__messages__content {
+  height: 100%;
+  overflow: auto;
+  max-height: 20vh;
+  font-size: 1.2em;
+}
+
+.timekeeper .timekeeper__charactor {
+  position: absolute;
+  left: 30px;
+  bottom: 0;
 }
 
 /* Utility

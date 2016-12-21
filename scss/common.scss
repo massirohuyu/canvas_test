@@ -354,7 +354,7 @@ body {
     position: fixed;
     left: 20px;
     top: 80px;
-    width: 20px;
+    width: 2em;
     z-index: 1000;
 
     label {
@@ -363,6 +363,11 @@ body {
         padding: .5em;
         color: lighten($clrMain, 50%);
         background-color: $clrMain;
+        cursor: pointer;
+
+        &:hover {
+            background-color: darken($clrMain, 10%);
+        }
 
         &.current {
             color: $clrAccent;
@@ -382,6 +387,115 @@ body {
 
     input {
         display: none;
+    }
+}
+
+.toolbox__sub {
+    @extend .toolbox;
+    left: calc(20px + 3em);
+    top: 80px;
+    margin-left: .2em;
+    width: auto;
+    height: 20px;
+
+    label {
+        color: darken($clrWhite, 10%);
+        background-color: lighten($clrBlack, 15%);
+        cursor: pointer;
+
+        &:hover {
+            background-color: $clrBlack;
+        }
+
+        &.current {
+            color: $clrAccent;
+            background-color: $clrBlack;
+        }
+
+        &:first-child {
+            border-radius: 0;
+            border-top-left-radius: .5em;
+            border-bottom-left-radius: .5em;
+        }
+
+        &:last-child {
+            border-radius: 0;
+            border-top-right-radius: .5em;
+            border-bottom-right-radius: .5em;
+        }
+    }
+}
+
+.toolbox__sub--sticky {
+    @extend .toolbox__sub;
+}
+
+/**
+ * timekeeper
+ */
+
+.timekeeper {
+    position: fixed;
+    z-index: 1001;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    .timekeeper__time-remaining {
+        position: absolute;
+        left: 30px;
+        bottom: 100px;
+        border-radius: .5em;
+        background-color: rgba(203, 29, 29, 0.8);
+        color: #fff;
+        font-weight: bold;
+        padding: 10px 15px;
+        text-align: center;
+        width: 60px;
+      
+      time {
+        font-size: 20px;
+      }
+    }
+
+    .timekeeper__messages {
+        position: absolute;
+        left: 150px;
+        bottom: 20px;
+        border-radius: .5em;
+        background-color: rgba(0, 0, 0, .7);
+        width: calc(100% - 200px - 2em);
+        padding: 1em 1.5em;
+        min-height: 3em;
+        color: #fff;
+
+        &:before {
+            content: "";
+            display: block;
+            position: absolute;
+            right: 100%;
+            bottom: 30px;
+            border-style: solid;
+            border-width: 10px 10px 10px 0;
+            border-color: transparent rgba(0, 0, 0, .7);
+        }
+      
+        .timekeeper__messages__content {
+          height: 100%;
+          overflow: auto;
+          max-height: 20vh;
+          font-size: 1.2em;
+        }
+    }
+
+    .timekeeper__form {
+      
+    }
+
+    .timekeeper__charactor {
+        position: absolute;
+        left: 30px;
+        bottom: 0;
     }
 }
 
