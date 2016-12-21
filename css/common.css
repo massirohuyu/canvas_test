@@ -502,6 +502,7 @@ body ul, body ol {
   bottom: 0;
   left: 0;
   right: 0;
+  height: 0;
 }
 
 .timekeeper .timekeeper__time-remaining {
@@ -515,6 +516,8 @@ body ul, body ol {
   padding: 10px 15px;
   text-align: center;
   width: 60px;
+  transform: translateY(0);
+  transition: transform .5s ease;
 }
 
 .timekeeper .timekeeper__time-remaining time {
@@ -531,6 +534,8 @@ body ul, body ol {
   padding: 1em 1.5em;
   min-height: 3em;
   color: #fff;
+  transform: translateY(0);
+  transition: transform .5s ease;
 }
 
 .timekeeper .timekeeper__messages:before {
@@ -555,6 +560,21 @@ body ul, body ol {
   position: absolute;
   left: 30px;
   bottom: 0;
+  cursor: pointer;
+  transform: translateY(0);
+  transition: transform .5s ease;
+}
+
+.timekeeper .timekeeper__toggler:checked ~ .timekeeper__time-remaining {
+  transform: translateY(calc(100%));
+}
+
+.timekeeper .timekeeper__toggler:checked ~ .timekeeper__messages {
+  transform: translateY(calc(100% + 20px));
+}
+
+.timekeeper .timekeeper__toggler:checked ~ .timekeeper__charactor {
+  transform: translateY(calc(100% - 40px));
 }
 
 /* Utility
