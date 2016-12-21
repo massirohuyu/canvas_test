@@ -52,12 +52,10 @@
 
 </body>
 <script>
-  // (function(){
-
-    var createCanvas = function(count) {
+   (function(){
       var canvasWidth = 2000,
           canvasHeight = 2000,
-          $canvas = $('<canvas id="demoCanvas' + count + '" width="' + canvasWidth + '" height="' + canvasHeight + '"></canvas>').appendTo('#mainCanvasContainer'),
+          $canvas = $('<canvas id="demoCanvas" class="main-canvas" width="' + canvasWidth + '" height="' + canvasHeight + '"></canvas>').appendTo('#mainCanvasContainer'),
           canvas = new fabric.Canvas($canvas[0]),
           defaultOptions = {
             left: 100,
@@ -95,7 +93,7 @@
           $colorButtons = (function(){
             var $buttonsBox = $('<div>');
             colors.forEach(function(color){
-              $button = $('<label><input type="radio" name="color_'+count+'">' + color[0] + '</label>');
+              $button = $('<label><input type="radio" name="color">' + color[0] + '</label>');
               $button.on('click', function() {
                 $buttonsBox.find('label').removeClass('current');
                 $(this).addClass('current');
@@ -109,7 +107,7 @@
           $objectButtons =  (function(){
             var $buttonsBox = $('<div>');
             object_types.forEach(function(object_type){
-              $button = $('<label><input type="radio" name="object_type_'+count+'">' + object_type + '</label>');
+              $button = $('<label><input type="radio" name="object_type">' + object_type + '</label>');
               $button.on('click', function() {
                 $buttonsBox.find('label').removeClass('current');
                 $(this).addClass('current');
@@ -365,12 +363,7 @@
         canvas.add(frame);
         canvas.sendToBack(frame);
       });
-    }
-
-    for(var i=0; i < 1; i++) {
-      createCanvas(i);
-    }
-  // })();
+   })();
 </script>
 
 </html>
