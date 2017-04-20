@@ -59,8 +59,8 @@ gulp.task('js-copy', function () {
 //------------------------------------------icon copy
 
 gulp.task('icon-copy', function () {
-    gulp.src('node_modules/material-design-icons/iconfont/*')
-        .pipe(gulp.dest('iconfont/'));
+    gulp.src('node_modules/font-awesome/fonts/*')
+        .pipe(gulp.dest('fonts/'));
 });
 
 

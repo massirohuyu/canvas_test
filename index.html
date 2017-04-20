@@ -111,9 +111,11 @@
           ],
           currentObjectType = object_types[0],
           $colorButtons = (function(){
-            var $buttonsBox = $('<div>');
+            var $buttonsBox = $('<div>'),
+                icon = 'sticky-note';
             colors.forEach(function(color){
-              $button = $('<label><input type="radio" name="color">' + color[0] + '</label>');
+              $button = $('<label title="' + color[0] + '"></label>');
+              $button.append('<input type="radio" name="color"><i class="fa fa-' + icon + '" aria-label="' + color[0] + '"></i>')
               $button.css('color', color[1])
               $button.on('click', function() {
                 $buttonsBox.find('label').removeClass('current');
@@ -128,7 +130,9 @@
           $objectButtons =  (function(){
             var $buttonsBox = $('<div>');
             object_types.forEach(function(object_type){
-              $button = $('<label><input type="radio" name="object_type">' + object_type + '</label>');
+              var icon = (object_type == 'sticky') ? 'sticky-note' : 'square-o',
+              $button = $('<label title="' + object_type + '"></label>');
+              $button.append('<input type="radio" name="object_type"><i class="fa fa-' + icon + '" aria-label="' + object_type + '">')
               $button.on('click', function() {
                 $buttonsBox.find('label').removeClass('current');
                 $(this).addClass('current');

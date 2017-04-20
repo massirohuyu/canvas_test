@@ -59,10 +59,19 @@ body {
     $clrWhite: #fff;
     $clrBlack: #333;
     $clrBase: #c3e8ea;
-    $clrMain: #215658;
-    $clrAccent: #ffeb48;
+    $clrMain: #5b979b;
+    $clrAccent: #f5ba60;
 
     $largeWidth: 1200;
+
+/* Fonts
+   ----------------------------------------------------------------- */
+
+@import 'node_modules/font-awesome/scss/font-awesome';
+
+.fa {
+  vertical-align: middle;
+}
 
 /* ----- */
 
@@ -350,6 +359,8 @@ body {
  * tool box
  */
 
+ $radius: 5px;
+
 .toolbox {
     position: fixed;
     left: 20px;
@@ -357,13 +368,35 @@ body {
     width: 2em;
     z-index: 1000;
 
+    &:before {
+        content: "";
+        display: block;
+        width: 40px;
+        height: 5px;
+        background-color: $clrMain;
+        border-top-right-radius: $radius;
+        border-top-left-radius: $radius;
+    }
+
+    &:after {
+        content: "";
+        display: block;
+        width: 40px;
+        height: 5px;
+        background-color: $clrMain;
+        border-bottom-right-radius: $radius;
+        border-bottom-left-radius: $radius;
+    }
+
     label {
         display: inline-block;
-        width: 2em;
-        padding: .5em;
+        width: 40px;
+        line-height: 35px;
         color: lighten($clrMain, 50%);
         background-color: $clrMain;
         cursor: pointer;
+        font-size: 20px;
+        text-align: center;
 
         &:hover {
             background-color: darken($clrMain, 10%);
@@ -372,16 +405,6 @@ body {
         &.current {
             color: $clrAccent;
             background-color: darken($clrMain, 10%);
-        }
-
-        &:first-child {
-            border-top-right-radius: .5em;
-            border-top-left-radius: .5em;
-        }
-
-        &:last-child {
-            border-bottom-right-radius: .5em;
-            border-bottom-left-radius: .5em;
         }
     }
 
@@ -392,13 +415,36 @@ body {
 
 .toolbox__sub {
     @extend .toolbox;
-    left: calc(20px + 3em);
-    top: 80px;
-    margin-left: .2em;
+    left: calc(20px + 40px);
+    top: 85px;
+    margin-left: 0;
     width: auto;
     height: 20px;
 
+    &:before {
+        float: left;
+        width: 10px;
+        height: 35px;
+        border-radius: 0;
+        background-color: lighten($clrBlack, 15%);
+    }
+
+    &:after {
+        float: right;
+        width: 10px;
+        height: 35px;
+        background-color: lighten($clrBlack, 15%);
+        border-radius: 0;
+        border-top-right-radius: $radius;
+        border-bottom-right-radius: $radius;
+    }
+
+    > div {
+        display: inline-block;
+    }
+
     label {
+        width: 35px;
         color: darken($clrWhite, 10%);
         background-color: lighten($clrBlack, 15%);
         cursor: pointer;
@@ -410,18 +456,6 @@ body {
         &.current {
             color: $clrAccent;
             background-color: $clrBlack;
-        }
-
-        &:first-child {
-            border-radius: 0;
-            border-top-left-radius: .5em;
-            border-bottom-left-radius: .5em;
-        }
-
-        &:last-child {
-            border-radius: 0;
-            border-top-right-radius: .5em;
-            border-bottom-right-radius: .5em;
         }
     }
 }
@@ -521,9 +555,6 @@ body {
 
 /* Utility
    ----------------------------------------------------------------- */
-
-@import "utility/clearfix";
-@import "utility/display";
 
 /*
 * collapse

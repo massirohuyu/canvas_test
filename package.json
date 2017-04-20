@@ -17,6 +17,7 @@
     "merge-stream": "^1.0.0"
   },
   "dependencies": {
+    "font-awesome": "^4.7.0",
     "jquery": "^2.1.4"
   },
   "private": true
